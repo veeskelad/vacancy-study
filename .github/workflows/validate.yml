@@ -1,0 +1,106 @@
+name: Validate Skill
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  validate:
+    name: Validate SKILL.md frontmatter
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install validator
+        run: |
+          pip install pyyaml
+
+      - name: Validate SKILL.md frontmatter
+        run: |
+          python - <<'PY'
+          import sys
+          import re
+          from pathlib import Path
+          import yaml
+
+          skill_path = Path("skills/vacancy-study/SKILL.md")
+          if not skill_path.exists():
+              print(f"::error::Missing {skill_path}")
+              sys.exit(1)
+
+          content = skill_path.read_text()
+          match = re.match(r"^---\n(.*?)\n---", content, re.DOTALL)
+          if not match:
+              print("::error::SKILL.md must start with a YAML frontmatter block delimited by ---")
+              sys.exit(1)
+
+          try:
+              fm = yaml.safe_load(match.group(1))
+          except yaml.YAMLError as e:
+              print(f"::error::Invalid YAML frontmatter: {e}")
+              sys.exit(1)
+
+          errors = []
+
+          # Required fields per https://agentskills.io/specification
+          if "name" not in fm:
+              errors.append("Missing required field: name")
+          else:
+              name = fm["name"]
+              if not isinstance(name, str) or len(name) > 64:
+                  errors.append("name must be a string of at most 64 characters")
+              if not re.fullmatch(r"[a-z0-9](?:[a-z0-9-]*[a-z0-9])?", name or ""):
+                  errors.append("name must match [a-z0-9-] with no leading/trailing hyphen")
+              if "--" in (name or ""):
+                  errors.append("name must not contain consecutive hyphens")
+              if name != skill_path.parent.name:
+                  errors.append(f"name '{name}' must match parent directory '{skill_path.parent.name}'")
+
+          if "description" not in fm:
+              errors.append("Missing required field: description")
+          else:
+              desc = fm["description"]
+              if not isinstance(desc, str):
+                  errors.append("description must be a string")
+              elif len(desc) > 1024:
+                  errors.append(f"description must be at most 1024 chars (got {len(desc)})")
+
+          # Recommended fields
+          if "license" not in fm:
+              print("::warning::No license field in frontmatter (recommended)")
+          if "metadata" not in fm:
+              print("::warning::No metadata field (recommended for author/version)")
+
+          # Check references referenced in SKILL.md exist
+          body = content[match.end():]
+          for ref_match in re.finditer(r"references/([\w-]+\.md)", body):
+              ref_file = skill_path.parent / "references" / ref_match.group(1)
+              if not ref_file.exists():
+                  errors.append(f"Referenced file does not exist: {ref_file}")
+
+          if errors:
+              for e in errors:
+                  print(f"::error::{e}")
+              sys.exit(1)
+
+          print("✓ SKILL.md frontmatter is valid")
+          print(f"  name: {fm['name']}")
+          print(f"  description length: {len(fm['description'])} chars")
+          print(f"  license: {fm.get('license', '(not specified)')}")
+          PY
+
+      - name: Validate plugin.json
+        run: |
+          python -c "import json; json.load(open('.claude-plugin/plugin.json')); print('✓ plugin.json is valid JSON')"
+
+      - name: Validate marketplace.json
+        run: |
+          python -c "import json; json.load(open('.claude-plugin/marketplace.json')); print('✓ marketplace.json is valid JSON')"

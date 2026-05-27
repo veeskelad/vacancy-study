@@ -1,0 +1,24 @@
+{
+  "name": "vacancy-study",
+  "owner": {
+    "name": "veeskelad",
+    "url": "https://github.com/veeskelad"
+  },
+  "description": "Marketplace for the vacancy-study skill — tailored interview preparation from a JD and resume.",
+  "plugins": [
+    {
+      "name": "vacancy-study",
+      "source": "./",
+      "description": "Generates hands-on labs, a prep file, a 2-minute self-introduction, theory cheatsheet, and one-liner Q&A from a job description and resume. Adapts shell commands to the user's OS. Multilingual.",
+      "version": "1.0.0",
+      "category": "career",
+      "tags": [
+        "interview-prep",
+        "job-search",
+        "career",
+        "labs",
+        "multilingual"
+      ]
+    }
+  ]
+}

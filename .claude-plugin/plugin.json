@@ -1,0 +1,30 @@
+{
+  "name": "vacancy-study",
+  "version": "1.0.0",
+  "description": "Tailored interview prep — turns a job description and resume into hands-on labs, a prep file, a 2-minute self-intro, theory cheatsheet, and one-liner Q&A. Works in Claude Code, Cowork, and Claude.ai. Multilingual.",
+  "author": {
+    "name": "veeskelad",
+    "url": "https://github.com/veeskelad"
+  },
+  "license": "MIT",
+  "homepage": "https://github.com/veeskelad/vacancy-study",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/veeskelad/vacancy-study.git"
+  },
+  "keywords": [
+    "agent-skills",
+    "claude-skill",
+    "claude-code",
+    "claude-plugin",
+    "anthropic",
+    "job-search",
+    "interview-prep",
+    "career",
+    "devops",
+    "ai-engineer"
+  ],
+  "skills": [
+    "./skills/vacancy-study"
+  ]
+}

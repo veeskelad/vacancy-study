@@ -1,0 +1,42 @@
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Editors
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+
+# Node
+node_modules/
+
+# Skill packaging output
+*.skill
+dist/
+build/
+
+# Local secrets
+.env
+.env.local
+*.pem
+*.key
+
+# Anthropic eval workspace
+*-workspace/
+evals/results/
+feedback.json
+
+# OS noise
+Thumbs.db
